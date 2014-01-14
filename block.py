@@ -39,23 +39,6 @@ class Block(object):
             for i in range(4):
                 new_config.append(['-', '-', '-', '-'])
 
-            # new_config[3][0] = self.config[0][0]
-            # new_config[2][0] = self.config[0][1]
-            # new_config[1][0] = self.config[0][2]
-            # new_config[0][0] = self.config[0][3]
-            # new_config[3][1] = self.config[1][0]
-            # new_config[2][1] = self.config[1][1]
-            # new_config[1][1] = self.config[1][2]
-            # new_config[0][1] = self.config[1][3]
-            # new_config[3][2] = self.config[2][0]
-            # new_config[2][2] = self.config[2][1]
-            # new_config[1][2] = self.config[2][2]
-            # new_config[0][2] = self.config[2][3]
-            # new_config[3][3] = self.config[3][0]
-            # new_config[2][3] = self.config[3][1]
-            # new_config[1][3] = self.config[3][2]
-            # new_config[0][3] = self.config[3][3]
-
             new_config[2][1] = self.config[0][1]
             new_config[1][1] = self.config[0][2]
             new_config[0][1] = self.config[0][3]
@@ -69,16 +52,6 @@ class Block(object):
             self.config = new_config
             self.num_rotations += 1
             self.num_rotations %= 4
-
-        # new_config[2][1] = self.config[0][1]
-        # new_config[1][1] = self.config[0][2]
-        # new_config[0][1] = self.config[0][3]
-        # new_config[2][2] = self.config[1][1]
-        # new_config[1][2] = self.config[1][2]
-        # new_config[0][2] = self.config[1][3]
-        # new_config[2][3] = self.config[2][1]
-        # new_config[1][3] = self.config[2][2]
-        # new_config[0][3] = self.config[2][3]
 
     def rotate_ccw(self):
         if self.block_type in ('L', 'J', 'T'):
