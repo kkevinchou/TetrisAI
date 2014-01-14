@@ -23,7 +23,7 @@ class Tetris(object):
         for row in range(4):
             for col in range(4):
                 if block.get_cell(col, row) == 'x':
-                    self.grid[row + position[1]][col + position[0]] = block.get_cell(col, row)
+                    self.grid[row + position[0]][col + position[1]] = block.get_cell(col, row)
 
     def _clear_row(self, row):
         for col in range(self.width):
@@ -50,6 +50,8 @@ class Tetris(object):
     def reset(self):
         self.grid = []
         self.block_pool = []
+        self.block = None
+        self.position = (0, 3)
 
         for row in range(self.height):
             empty_row = []
@@ -57,37 +59,24 @@ class Tetris(object):
                 empty_row.append('-')
             self.grid.append(empty_row)
 
-    def generate_piece(self):
+    def start(self):
+        self.generate_block()
+
+    def generate_block(self):
         if len(self.block_pool) == 0:
             self.block_pool = Block.generate_pool()
 
-        block = self.block_pool.pop()
-        # self._place_block(block, (0, 10))
-        self.flash(block, (0, 10))
-        self.print_grid()
-        self.reset()
-        # block.rotate_ccw()
-        # self._place_block(block, (0, 0))
-        # self.print_grid()
-        # self.reset()
-        # block.rotate_ccw()
-        # self._place_block(block, (0, 0))
-        # self.print_grid()
-        # self.reset()
-        # block.rotate_ccw()
-        # self._place_block(block, (0, 0))
-        # self.print_grid()
-        # self.reset()
+        self.block = self.block_pool.pop()
 
-    def flash(self, block, position):
+    def flash(self):
         collision_y = 99 # TODO: actually find a good initial value here
 
         for row in range(4):
             for col in range(4):
-                if block.get_cell(col, row) == 'x':
-                    collision_y = min(self._get_collision_y(col + position[0]) - row, collision_y)
+                if self.block.get_cell(col, row) == 'x':
+                    collision_y = min(self._get_collision_y(col + self.position[1]) - col, collision_y)
 
-        self._place_block(block, (position[0], collision_y))
+        self._place_block(self.block, (collision_y, self.position[1]))
 
     def print_grid(self):
         print ['=' for col in self.grid[0]]

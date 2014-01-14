@@ -20,13 +20,14 @@ done = False
 clock = pygame.time.Clock()
 
 game = Tetris()
-game.generate_piece()
-sys.exit()
+# sys.exit()
  
 while not done:
-    clock.tick(60)
+    clock.tick(1)
 
-    game.generate_piece()
+    game.generate_block()
+    game.flash()
+    game.print_grid()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
