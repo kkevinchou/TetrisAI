@@ -12,15 +12,24 @@ GREEN = (  0, 255,   0)
 RED =   (255,   0,   0)
  
 size = [400, 300]
-screen = pygame.display.set_mode(size)
- 
-pygame.display.set_caption('Tetris AI')
+# screen = pygame.display.set_mode(size)
+# pygame.display.set_caption('Tetris AI')
  
 done = False
 clock = pygame.time.Clock()
 
 game = Tetris()
-# sys.exit()
+block = game.generate_block()
+block.rotate_ccw()
+block.rotate_ccw()
+game.flash((-1, 0), block)
+game.flash((2, 0), block)
+game.flash((5, 0), block)
+block.rotate_ccw()
+game.flash((7, 0), block)
+game.settle()
+game.print_grid()
+sys.exit()
  
 while not done:
     clock.tick(1)
