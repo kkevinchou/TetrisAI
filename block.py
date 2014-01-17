@@ -12,13 +12,14 @@ import copy
 import random
 
 BLOCK_CONFIGS = {
-    'O': [['-', '-', '-', '-'], ['-', 'x', 'x', '-'], ['-', 'x', 'x', '-'], ['-', '-', '-', '-']],
-    'I': [['-', '-', '-', '-'], ['x', 'x', 'x', 'x'], ['-', '-', '-', '-'], ['-', '-', '-', '-']],
-    'S': [['-', '-', '-', '-'], ['-', '-', 'x', 'x'], ['-', 'x', 'x', '-'], ['-', '-', '-', '-']],
-    'Z': [['-', '-', '-', '-'], ['-', 'x', 'x', '-'], ['-', '-', 'x', 'x'], ['-', '-', '-', '-']],
-    'L': [['-', '-', '-', '-'], ['-', 'x', 'x', 'x'], ['-', 'x', '-', '-'], ['-', '-', '-', '-']],
-    'J': [['-', '-', '-', '-'], ['-', 'x', 'x', 'x'], ['-', '-', '-', 'x'], ['-', '-', '-', '-']],
-    'T': [['-', '-', '-', '-'], ['-', 'x', 'x', 'x'], ['-', '-', 'x', '-'], ['-', '-', '-', '-']],
+    'T': [['-', '-', '-', '-'], ['-', 'x', '-', '-'], ['-', 'x', 'x', '-'], ['-', 'x', '-', '-']],
+    # 'O': [['-', '-', '-', '-'], ['-', 'x', 'x', '-'], ['-', 'x', 'x', '-'], ['-', '-', '-', '-']],
+    # 'I': [['-', '-', '-', '-'], ['x', 'x', 'x', 'x'], ['-', '-', '-', '-'], ['-', '-', '-', '-']],
+    # 'S': [['-', '-', '-', '-'], ['-', '-', 'x', 'x'], ['-', 'x', 'x', '-'], ['-', '-', '-', '-']],
+    # 'Z': [['-', '-', '-', '-'], ['-', 'x', 'x', '-'], ['-', '-', 'x', 'x'], ['-', '-', '-', '-']],
+    # 'L': [['-', '-', '-', '-'], ['-', 'x', 'x', 'x'], ['-', 'x', '-', '-'], ['-', '-', '-', '-']],
+    # 'J': [['-', '-', '-', '-'], ['-', 'x', 'x', 'x'], ['-', '-', '-', 'x'], ['-', '-', '-', '-']],
+    # 'T': [['-', '-', '-', '-'], ['-', 'x', 'x', 'x'], ['-', '-', 'x', '-'], ['-', '-', '-', '-']],
 }
 
 class Block(object):
@@ -39,15 +40,15 @@ class Block(object):
             for i in range(4):
                 new_config.append(['-', '-', '-', '-'])
 
-            new_config[2][1] = self.config[0][1]
-            new_config[1][1] = self.config[0][2]
-            new_config[0][1] = self.config[0][3]
+            new_config[1][2] = self.config[1][0]
+            new_config[1][1] = self.config[2][0]
+            new_config[1][0] = self.config[3][0]
             new_config[2][2] = self.config[1][1]
-            new_config[1][2] = self.config[1][2]
-            new_config[0][2] = self.config[1][3]
-            new_config[2][3] = self.config[2][1]
-            new_config[1][3] = self.config[2][2]
-            new_config[0][3] = self.config[2][3]
+            new_config[2][1] = self.config[2][1]
+            new_config[2][0] = self.config[3][1]
+            new_config[3][2] = self.config[1][2]
+            new_config[3][1] = self.config[2][2]
+            new_config[3][0] = self.config[3][2]
 
             self.config = new_config
             self.num_rotations += 1
@@ -64,15 +65,15 @@ class Block(object):
         elif self.block_type == 'I':
             if self.num_rotations == 0:
                 self._rotate_ccw(1)
-                self.config[1][0] = '-'
-                self.config[3][2] = 'x'
+                self.config[0][1] = '-'
+                self.config[2][3] = 'x'
             else:
                 self._rotate_ccw(3)
-                self.config[1][0] = 'x'
-                self.config[3][2] = '-'
+                self.config[0][1] = 'x'
+                self.config[2][3] = '-'
 
     def get_cell(self, x, y):
-        return self.config[y][x]
+        return self.config[x][y]
 
     def __str__(self):
         return '\n'.join(' '.join(row) for row in self.config)

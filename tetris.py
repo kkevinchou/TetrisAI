@@ -9,43 +9,38 @@ class Tetris(object):
     def __init__(self):
         self.reset()
 
-    def _get_cell(self, col, row):
-        return self.grid[row][col]
+    def _get_cell(self, x, y):
+        return self.grid[x][y]
 
-    def _get_collision_y(self, col):
-        for row in range(self.height):
-            if self._get_cell(col, row) == 'x':
-                return row - 1
+    def _get_collision_y(self, x):
+        for y in range(self.height):
+            if self._get_cell(x, y) == 'x':
+                return y - 1
 
         return self.height - 1
 
-    def _place_block(self, block, position):
-        for row in range(4):
-            for col in range(4):
-                if block.get_cell(col, row) == 'x':
-                    self.grid[row + position[0]][col + position[1]] = block.get_cell(col, row)
+    def place_block(self, position, block=None):
+        actual_block = block if block is not None else self.block
 
-    def _clear_row(self, row):
-        for col in range(self.width):
-            self.grid[row][col] = '-'
+        for x in range(4):
+            for y in range(4):
+                if actual_block.get_cell(x, y) == 'x':
+                    self.grid[x + position[0]][y + position[1]] = actual_block.get_cell(x, y)
+
+    def _clear_row(self, y):
+        for x in range(self.width):
+            self.grid[x][y] = '-'
 
     def _row_is_empty(self, row):
-        for col in range(self.width):
-            if self.grid[row][col] == 'x':
-                return False
-
-        return True
+        return 'x' not in self.get_row(row)
 
     def _copy_row_to(self, row_from, row_to):
-        for col in range(self.width):
-            self.grid[row_to][col] = self._get_cell(col, row_from)
+        for x in range(self.width):
+            self.grid[x][row_to] = self._get_cell(x, row_from)
 
     def _cut_row_to(self, row_from, row_to):
-        for col in range(self.width):
-            self.grid[row_to][col] = self._get_cell(col, row_from)
-
-        for col in range(self.width):
-            self.grid[row_from][col] = '-'
+        self._copy_row_to(row_from, row_to)
+        self._clear_row(row_from)
 
     def reset(self):
         self.grid = []
@@ -53,11 +48,11 @@ class Tetris(object):
         self.block = None
         self.position = (0, 3)
 
-        for row in range(self.height):
-            empty_row = []
-            for col in range(self.width):
-                empty_row.append('-')
-            self.grid.append(empty_row)
+        for x in range(self.width):
+            empty_column = []
+            for y in range(self.height):
+                empty_column.append('-')
+            self.grid.append(empty_column)
 
     def start(self):
         self.generate_block()
@@ -67,44 +62,51 @@ class Tetris(object):
             self.block_pool = Block.generate_pool()
 
         self.block = self.block_pool.pop()
+        return self.block
 
-    def flash(self):
+    def flash(self, position, block=None):
+        actual_block = block if block is not None else self.block
         collision_y = 99 # TODO: actually find a good initial value here
 
-        for row in range(4):
-            for col in range(4):
-                if self.block.get_cell(col, row) == 'x':
-                    collision_y = min(self._get_collision_y(col + self.position[1]) - col, collision_y)
+        for x in range(4):
+            for y in range(4):
+                if self.block.get_cell(x, y) == 'x':
+                    collision_y = min(self._get_collision_y(x + position[0]) - y, collision_y)
 
-        self._place_block(self.block, (collision_y, self.position[1]))
+        self.place_block((position[0], collision_y), actual_block)
 
     def print_grid(self):
-        print ['=' for col in self.grid[0]]
-        for row in self.grid:
-            print row
-        print ['=' for col in self.grid[0]]
+        border_str = ' '.join(['=' for x in range(self.width)])
+        print border_str
+        for y in range(self.height):
+            row_str = []
+            for x in range(self.width):
+                row_str.append(self.grid[x][y])
+            print ' '.join(row_str)
+        print border_str
+
+    def get_row(self, y):
+        return [self.grid[x][y] for x in range(self.width)]
+
+    def iter_row(self):
+        for y in range(self.height - 1, -1, -1):
+            yield y, [self.grid[x][y] for x in range(self.width)]
 
     def settle(self):
-        for row in range(self.height - 1, -1, -1):
-            filled_row = True
-            
-            for col in range(self.width):
-                if self._get_cell(col, row) == '-':
-                    filled_row = False
-                    break
-
+        for row_index, row in self.iter_row():
+            filled_row = '-' not in row
             if filled_row:
-                self._clear_row(row)
+                self._clear_row(row_index)
 
         non_empty_rows = []
-        for row in range(self.height - 1, -1, -1):
-            if not self._row_is_empty(row):
-                non_empty_rows.append(row)
+        for row_index, row in self.iter_row():
+            if not self._row_is_empty(row_index):
+                non_empty_rows.append(row_index)
 
         next_empty_row = None
-        for row in range(self.height - 1, -1, -1):
-            if self._row_is_empty(row):
-                next_empty_row = row
+        for row_index, row in self.iter_row():
+            if self._row_is_empty(row_index):
+                next_empty_row = row_index
                 break
 
         if next_empty_row is None:
