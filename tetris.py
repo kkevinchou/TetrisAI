@@ -9,23 +9,21 @@ class Tetris(object):
     def __init__(self):
         self.reset()
 
-    def _get_cell(self, x, y):
+    def get_cell(self, x, y):
         return self.grid[x][y]
 
     def _get_collision_y(self, x):
         for y in range(self.height):
-            if self._get_cell(x, y) == 'x':
+            if self.get_cell(x, y) == 'x':
                 return y - 1
 
         return self.height - 1
 
-    def place_block(self, position, block=None):
-        actual_block = block if block is not None else self.block
-
+    def place_block(self, block, position):
         for x in range(4):
             for y in range(4):
-                if actual_block.get_cell(x, y) == 'x':
-                    self.grid[x + position[0]][y + position[1]] = actual_block.get_cell(x, y)
+                if block.get_cell(x, y) == 'x':
+                    self.grid[x + position[0]][y + position[1]] = 'x'
 
     def _clear_row(self, y):
         for x in range(self.width):
@@ -36,7 +34,7 @@ class Tetris(object):
 
     def _copy_row_to(self, row_from, row_to):
         for x in range(self.width):
-            self.grid[x][row_to] = self._get_cell(x, row_from)
+            self.grid[x][row_to] = self.get_cell(x, row_from)
 
     def _cut_row_to(self, row_from, row_to):
         self._copy_row_to(row_from, row_to)
@@ -46,7 +44,7 @@ class Tetris(object):
         self.grid = []
         self.block_pool = []
         self.block = None
-        self.position = (0, 3)
+        self.position = (0, 0)
 
         for x in range(self.width):
             empty_column = []
@@ -55,17 +53,59 @@ class Tetris(object):
             self.grid.append(empty_column)
 
     def start(self):
-        self.generate_block()
+        self.block = self.generate_block()
+        self.place_block(self.block, self.position)
+
+    def can_place(self, block, position):
+        for x in range(4):
+            for y in range(4):
+                x_pos = position[0] + x
+                y_pos = position[1] + y
+
+                if block.get_cell(x, y) == 'x':
+                    if (x_pos >= self.width or y_pos >= self.height) or (x_pos < 0) or (self.get_cell(x_pos, y_pos) == 'x'):
+                        return False
+
+        return True
+
+    def hide_current_block(self):
+        for x in range(4):
+            for y in range(4):
+                if self.block.get_cell(x, y) == 'x':
+                    self.grid[self.position[0] + x][self.position[1] + y] = '-'
+
+    def move_down(self):
+        new_position = (self.position[0], self.position[1] + 1)
+        self.move_block(new_position)
+
+    def move_up(self):
+        new_position = (self.position[0], self.position[1] - 1)
+        self.move_block(new_position)
+
+    def move_left(self):
+        new_position = (self.position[0] - 1, self.position[1])
+        self.move_block(new_position)
+
+    def move_right(self):
+        new_position = (self.position[0] + 1, self.position[1])
+        self.move_block(new_position)
+
+    def move_block(self, new_position):
+        self.hide_current_block()
+        if self.can_place(self.block, new_position):
+            self.place_block(self.block, new_position)
+            self.position = new_position
+        else:
+            self.place_block(self.block, self.position)
 
     def generate_block(self):
         if len(self.block_pool) == 0:
             self.block_pool = Block.generate_pool()
 
-        self.block = self.block_pool.pop()
-        return self.block
+        return self.block_pool.pop()
 
-    def flash(self, position, block=None):
-        actual_block = block if block is not None else self.block
+    def flash(self, position):
+        actual_block = self.block
         collision_y = 99 # TODO: actually find a good initial value here
 
         for x in range(4):
@@ -73,7 +113,7 @@ class Tetris(object):
                 if self.block.get_cell(x, y) == 'x':
                     collision_y = min(self._get_collision_y(x + position[0]) - y, collision_y)
 
-        self.place_block((position[0], collision_y), actual_block)
+        self.place_block(actual_block, (position[0], collision_y))
 
     def print_grid(self):
         border_str = ' '.join(['=' for x in range(self.width)])
