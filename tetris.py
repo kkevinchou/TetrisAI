@@ -7,12 +7,37 @@ class Tetris(object):
     height = 22
 
     def __init__(self):
+        self.events = []
+        self.init_controls()
         self.reset()
+
+    def init_controls(self):
+        self.event_to_action = {
+            'FLASH': self.flash,
+            'UP': self.move_up,
+            'DOWN': self.move_down,
+            'LEFT': self.move_left,
+            'RIGHT': self.move_right,
+            'ROTATE': self.rotate,
+        }
+
+    def reset(self):
+        self.grid = []
+        self.block_pool = []
+        self.block = None
+        self.position = (0, 0)
+        self.gravity_timer = 0
+
+        for x in range(self.width):
+            empty_column = []
+            for y in range(self.height):
+                empty_column.append('-')
+            self.grid.append(empty_column)
 
     def get_cell(self, x, y):
         return self.grid[x][y]
 
-    def _get_collision_y(self, x):
+    def _get_collision_y(selfself, x):
         for y in range(self.height):
             if self.get_cell(x, y) == 'x':
                 return y - 1
@@ -37,22 +62,13 @@ class Tetris(object):
             self.grid[x][row_to] = self.get_cell(x, row_from)
 
     def _cut_row_to(self, row_from, row_to):
+        if row_from == row_to:
+            return
         self._copy_row_to(row_from, row_to)
         self._clear_row(row_from)
 
-    def reset(self):
-        self.grid = []
-        self.block_pool = []
-        self.block = None
-        self.position = (0, 0)
-
-        for x in range(self.width):
-            empty_column = []
-            for y in range(self.height):
-                empty_column.append('-')
-            self.grid.append(empty_column)
-
     def start(self):
+        self.position = (0, 0)
         self.block = self.generate_block()
         self.place_block(self.block, self.position)
 
@@ -76,27 +92,29 @@ class Tetris(object):
 
     def move_down(self):
         new_position = (self.position[0], self.position[1] + 1)
-        self.move_block(new_position)
+        return self.move_block(new_position)
 
     def move_up(self):
         new_position = (self.position[0], self.position[1] - 1)
-        self.move_block(new_position)
+        return self.move_block(new_position)
 
     def move_left(self):
         new_position = (self.position[0] - 1, self.position[1])
-        self.move_block(new_position)
+        return self.move_block(new_position)
 
     def move_right(self):
         new_position = (self.position[0] + 1, self.position[1])
-        self.move_block(new_position)
+        return self.move_block(new_position)
 
     def move_block(self, new_position):
         self.hide_current_block()
         if self.can_place(self.block, new_position):
             self.place_block(self.block, new_position)
             self.position = new_position
+            return True
         else:
             self.place_block(self.block, self.position)
+            return False
 
     def generate_block(self):
         if len(self.block_pool) == 0:
@@ -104,16 +122,18 @@ class Tetris(object):
 
         return self.block_pool.pop()
 
-    def flash(self, position):
-        actual_block = self.block
-        collision_y = 99 # TODO: actually find a good initial value here
+    def flash(self):
+        while self.move_down():
+            pass
 
-        for x in range(4):
-            for y in range(4):
-                if self.block.get_cell(x, y) == 'x':
-                    collision_y = min(self._get_collision_y(x + position[0]) - y, collision_y)
+        self.settle()
+        self.start()
+        self.gravity_timer = 0
 
-        self.place_block(actual_block, (position[0], collision_y))
+    def rotate(self):
+        self.hide_current_block()
+        self.block.rotate_cw()
+        self.place_block(self.block, self.position)
 
     def print_grid(self):
         border_str = ' '.join(['=' for x in range(self.width)])
@@ -143,16 +163,32 @@ class Tetris(object):
             if not self._row_is_empty(row_index):
                 non_empty_rows.append(row_index)
 
-        next_empty_row = None
-        for row_index, row in self.iter_row():
-            if self._row_is_empty(row_index):
-                next_empty_row = row_index
-                break
-
-        if next_empty_row is None:
-            raise Exception('next_empty_row is None')
+        next_fill_row = self.height-1
 
         for non_empty_row in non_empty_rows:
-            self._cut_row_to(non_empty_row, next_empty_row)
-            next_empty_row -= 1
+            self._cut_row_to(non_empty_row, next_fill_row)
+            next_fill_row -= 1
+
+    def event(self, event_type):
+        self.events.append(event_type)
+
+    def update(self, delta):
+        self.gravity_timer += delta
+
+        for event in list(self.events):
+            self.events.remove(event)
+            if event == 'EXIT':
+                return False
+            elif event in self.event_to_action:
+                self.event_to_action[event]()
+
+        if self.gravity_timer >= 1000:
+            self.gravity_timer -= 1000
+            moved = self.move_down()
+
+            if not moved:
+                self.settle()
+                self.start()
+
+        return True
 
