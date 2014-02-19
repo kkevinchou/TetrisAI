@@ -1,13 +1,3 @@
-'''
-
-  0 1 2 3
-0 - - - -
-1 - - - -
-2 - - - -
-3 - - - -
-
-'''
-
 import copy
 import random
 
@@ -20,12 +10,6 @@ BLOCK_CONFIGS = {
     'Z': [['-', 'x', '-', '-'], ['-', 'x', 'x', '-'], ['-', '-', 'x', '-'], ['-', '-', '-', '-']],
     'T': [['-', 'x', '-', '-'], ['-', 'x', 'x', '-'], ['-', 'x', '-', '-'], ['-', '-', '-', '-']],
 }
-
-#   0 1 2 3
-# 0 - - - x
-# 1 - - - x
-# 2 - - - x
-# 3 x x x x
 
 class Block(object):
     def __init__(self, block_type, config):
@@ -78,6 +62,9 @@ class Block(object):
 
     def get_cell(self, x, y):
         return self.config[x][y]
+
+    def copy(self):
+        return Block(self.block_type, copy.deepcopy(self.config))
 
     def __str__(self):
         return '\n'.join(' '.join(row) for row in self.config)

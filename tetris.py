@@ -122,18 +122,19 @@ class Tetris(object):
 
         return self.block_pool.pop()
 
-    def flash(self):
+    def flash(self, settle=True):
         while self.move_down():
             pass
 
-        self.settle()
-        self.start()
-        self.gravity_timer = 0
+        if settle:
+            self.settle()
+            self.start()
+            self.gravity_timer = 0
 
     def rotate(self):
         self.hide_current_block()
         self.block.rotate_cw()
-        self.place_block(self.block, self.position)
+        self.place_block(self.block, jdbjjself.position)
 
     def print_grid(self):
         border_str = ' '.join(['=' for x in range(self.width)])
@@ -191,4 +192,36 @@ class Tetris(object):
                 self.start()
 
         return True
+
+    def find_next_move(self):
+        grid_backup = copyopy.deepcopy(self.grid)
+        block_backup = self.block.copy()
+        position_backup = position
+
+        # TODO find an actual good min here
+        best_score = -999
+        best_x = 0
+        best_rotation = 0
+
+        for num_rotation in range(4):
+            self.position = (0, 0)
+
+            for rotation in num_rotation:
+                self.block.rotate_cw()
+
+            while self.move_left():
+                pass
+
+            for x in range(self.width):
+                if self.move_right() == False:
+                    break
+
+                self.flash(settle=False)
+
+                # calculate score
+                # if better than best score, replace
+
+
+
+
 
