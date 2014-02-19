@@ -1,6 +1,7 @@
 import copy
 import random
 from block import Block
+from fitness import calculate_fitness
 
 class Tetris(object):
     width = 10
@@ -134,7 +135,7 @@ class Tetris(object):
     def rotate(self):
         self.hide_current_block()
         self.block.rotate_cw()
-        self.place_block(self.block, jdbjjself.position)
+        self.place_block(self.block, self.position)
 
     def print_grid(self):
         border_str = ' '.join(['=' for x in range(self.width)])
@@ -191,12 +192,14 @@ class Tetris(object):
                 self.settle()
                 self.start()
 
+        print self.find_next_move()
+
         return True
 
     def find_next_move(self):
-        grid_backup = copyopy.deepcopy(self.grid)
+        grid_backup = copy.deepcopy(self.grid)
         block_backup = self.block.copy()
-        position_backup = position
+        position_backup = self.position
 
         # TODO find an actual good min here
         best_score = -999
@@ -206,7 +209,7 @@ class Tetris(object):
         for num_rotation in range(4):
             self.position = (0, 0)
 
-            for rotation in num_rotation:
+            for rotation in range(num_rotation):
                 self.block.rotate_cw()
 
             while self.move_left():
@@ -217,9 +220,18 @@ class Tetris(object):
                     break
 
                 self.flash(settle=False)
+                fitness_score = calculate_fitness(self.grid, [1])
 
-                # calculate score
-                # if better than best score, replace
+                if fitness_score > best_score:
+                    best_score = fitness_score
+                    best_x = x
+                    best_rotation = num_rotation
+
+        self.position = position_backup
+        self.block = block_backup
+        self.grid = grid_backup
+
+        return (best_x, best_rotation)
 
 
 
