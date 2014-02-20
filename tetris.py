@@ -192,8 +192,6 @@ class Tetris(object):
                 self.settle()
                 self.start()
 
-        print self.find_next_move()
-
         return True
 
     def find_next_move(self):
@@ -207,25 +205,25 @@ class Tetris(object):
         best_rotation = 0
 
         for num_rotation in range(4):
-            self.position = (0, 0)
+            self.move_block((0, 0))
 
             for rotation in range(num_rotation):
-                self.block.rotate_cw()
+                self.rotate()
 
             while self.move_left():
                 pass
 
             for x in range(self.width):
-                if self.move_right() == False:
-                    break
-
                 self.flash(settle=False)
                 fitness_score = calculate_fitness(self.grid, [1])
 
                 if fitness_score > best_score:
                     best_score = fitness_score
-                    best_x = x
+                    best_x = self.position[0]
                     best_rotation = num_rotation
+
+                if self.move_right() == False:
+                    break
 
         self.position = position_backup
         self.block = block_backup
