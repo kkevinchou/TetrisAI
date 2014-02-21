@@ -57,6 +57,7 @@ def render(game):
 
     pygame.display.flip()
 
+
 while not done:
     delta = clock.tick(60)
 
@@ -71,7 +72,6 @@ while not done:
     if not game.update(delta):
         break
 
-    print game.find_next_move()
     render(game)
 
 pygame.quit()

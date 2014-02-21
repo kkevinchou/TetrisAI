@@ -20,6 +20,20 @@ def get_neighbors(x, y, width, height):
 
     return neighbors
 
+def grid_height(grid):
+    width = len(grid)
+    height = len(grid[0])
+
+    configuration_height = 0
+
+    for y in range(height):
+        for x in range(width):
+            if grid[x][y] == 'x':
+                configuration_height = height - y
+                return configuration_height / float(height)
+
+    return 0
+
 def sides_touching(grid):
     width = len(grid)
     height = len(grid[0])
@@ -39,15 +53,53 @@ def sides_touching(grid):
                     sides_touching += 1
                 total_sides_touching += 1
 
-    return sides_touching
+    return sides_touching / float(total_sides_touching)
+
+def blockages(grid):
+    width = len(grid)
+    height = len(grid[0])
+
+    blockages = 0
+
+    for x in range(width):
+        for y in range(1, height):
+            if grid[x][y] != 'x':
+                k = y - 1
+                while k >= 0:
+                    if grid[x][k] == 'x':
+                        blockages += 1
+                        break
+                    k -= 1
+
+    return blockages / float(height / 2 * width)
+
+
+def rows_cleared(grid):
+    width = len(grid)
+    height = len(grid[0])
+    num_rows_filled = 0
+
+    for y in range(height):
+        row_filled = True
+        for x in range(width):
+            if grid[x][y] != 'x':
+                row_filled = False
+                break
+        if row_filled:
+            num_rows_filled += 1
+
+    return num_rows_filled / float(height)
 
 
 def calculate_fitness(grid, weights):
-    fitness_functions = [sides_touching]
+    fitness_functions = [sides_touching, grid_height, rows_cleared, blockages]
     fitness_value = 0
 
+    print ' ============ '
     for i in range(len(weights)):
-        fitness_value += weights[i] * fitness_functions[i](grid)
+        fitness_function_value = fitness_functions[i](grid)
+        print '{} --- {}'.format(fitness_functions[i].__name__, fitness_function_value * weights[i])
+        fitness_value += weights[i] * fitness_function_value
 
     return fitness_value
 

@@ -1,5 +1,6 @@
 import copy
 import random
+import math
 from block import Block
 from fitness import calculate_fitness
 
@@ -7,10 +8,24 @@ class Tetris(object):
     width = 10
     height = 22
 
-    def __init__(self):
+    def __init__(self, read_grid=False):
         self.events = []
         self.init_controls()
         self.reset()
+
+        if read_grid:
+            with open('grid.dat') as f:
+                y = 0
+                for line in f:
+                    if len(line) < self.width:
+                        break
+
+                    x = 0
+                    for cell in line:
+                        if cell == 'x':
+                            self.grid[x][y] = 'x'
+                        x += 1
+                    y += 1
 
     def init_controls(self):
         self.event_to_action = {
@@ -28,6 +43,7 @@ class Tetris(object):
         self.block = None
         self.position = (0, 0)
         self.gravity_timer = 0
+        self.make_move_timer = 0
 
         for x in range(self.width):
             empty_column = []
@@ -176,6 +192,7 @@ class Tetris(object):
 
     def update(self, delta):
         self.gravity_timer += delta
+        self.make_move_timer += delta
 
         for event in list(self.events):
             self.events.remove(event)
@@ -183,6 +200,10 @@ class Tetris(object):
                 return False
             elif event in self.event_to_action:
                 self.event_to_action[event]()
+
+        if self.make_move_timer >= 500:
+            self.make_move_timer -= 500
+            self.make_move()
 
         if self.gravity_timer >= 1000:
             self.gravity_timer -= 1000
@@ -193,6 +214,22 @@ class Tetris(object):
                 self.start()
 
         return True
+
+    def make_move(self):
+        x_movement, num_rotations = self.find_next_move()
+
+        if x_movement < 0:
+            move_function = self.move_left
+        else:
+            move_function = self.move_right
+
+        for i in range(num_rotations):
+            self.rotate()
+            
+        for i in range(int(math.fabs(x_movement))):
+            move_function()
+
+        self.flash()
 
     def find_next_move(self):
         grid_backup = copy.deepcopy(self.grid)
@@ -207,7 +244,7 @@ class Tetris(object):
         for num_rotation in range(4):
             self.move_block((0, 0))
 
-            for rotation in range(num_rotation):
+            if num_rotation > 0:
                 self.rotate()
 
             while self.move_left():
@@ -215,12 +252,15 @@ class Tetris(object):
 
             for x in range(self.width):
                 self.flash(settle=False)
-                fitness_score = calculate_fitness(self.grid, [1])
+                fitness_score = calculate_fitness(self.grid, [4, -4, 5, -10])
+                print (best_x, num_rotation, fitness_score)
 
                 if fitness_score > best_score:
                     best_score = fitness_score
                     best_x = self.position[0]
                     best_rotation = num_rotation
+
+                self.move_block((self.position[0], 0))
 
                 if self.move_right() == False:
                     break
