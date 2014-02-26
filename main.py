@@ -57,10 +57,8 @@ def render(game):
 
     pygame.display.flip()
 
-
+num_updates = 0
 while not done:
-    delta = clock.tick(60)
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
@@ -69,9 +67,13 @@ while not done:
             if event_type is not None:
                 game.event(event_type)
 
-    if not game.update(delta):
+    if game.update():
+        num_updates += 1
+    else:
         break
 
     render(game)
+
+print '{} UPDATES'.format(num_updates)
 
 pygame.quit()

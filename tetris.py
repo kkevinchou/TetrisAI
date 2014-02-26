@@ -5,7 +5,7 @@ from block import Block
 from fitness import calculate_fitness
 
 class Tetris(object):
-    width = 10
+    width = 8
     height = 22
 
     def __init__(self, read_grid=False):
@@ -87,7 +87,12 @@ class Tetris(object):
     def start(self):
         self.position = (0, 0)
         self.block = self.generate_block()
-        self.place_block(self.block, self.position)
+
+        if self.can_place(self.block, self.position):
+            self.place_block(self.block, self.position)
+            return True
+
+        return False
 
     def can_place(self, block, position):
         for x in range(4):
@@ -139,14 +144,9 @@ class Tetris(object):
 
         return self.block_pool.pop()
 
-    def flash(self, settle=True):
+    def flash(self):
         while self.move_down():
             pass
-
-        if settle:
-            self.settle()
-            self.start()
-            self.gravity_timer = 0
 
     def rotate(self):
         self.hide_current_block()
@@ -190,28 +190,11 @@ class Tetris(object):
     def event(self, event_type):
         self.events.append(event_type)
 
-    def update(self, delta):
-        self.gravity_timer += delta
-        self.make_move_timer += delta
-
-        for event in list(self.events):
-            self.events.remove(event)
-            if event == 'EXIT':
-                return False
-            elif event in self.event_to_action:
-                self.event_to_action[event]()
-
-        if self.make_move_timer >= 500:
-            self.make_move_timer -= 500
-            self.make_move()
-
-        if self.gravity_timer >= 1000:
-            self.gravity_timer -= 1000
-            moved = self.move_down()
-
-            if not moved:
-                self.settle()
-                self.start()
+    def update(self):
+        self.make_move()
+        self.settle()
+        if not self.start():
+            return False
 
         return True
 
@@ -251,9 +234,9 @@ class Tetris(object):
                 pass
 
             for x in range(self.width):
-                self.flash(settle=False)
-                fitness_score = calculate_fitness(self.grid, [4, -4, 5, -10])
-                print (best_x, num_rotation, fitness_score)
+                self.flash()
+                fitness_score = calculate_fitness(self.grid, [4, -4, 3.5, -10])
+                # print (self.position[0], num_rotation, fitness_score)
 
                 if fitness_score > best_score:
                     best_score = fitness_score
@@ -269,9 +252,89 @@ class Tetris(object):
         self.block = block_backup
         self.grid = grid_backup
 
+        # print (best_x, best_rotation, best_score)
         return (best_x, best_rotation)
 
+    @classmethod
+    def main(self):
+        import random
+        import pygame
+        import sys
+        from math import pi
+         
+        pygame.init()
 
+        TILE_SIZE = 25
+         
+        BLACK = (  0,   0,   0)
+        WHITE = (255, 255, 255)
+        BLUE =  (  0,   0, 255)
+        GREEN = (  0, 255,   0)
+        RED =   (255,   0,   0)
+         
+        size = [800, 600]
+        screen = pygame.display.set_mode(size)
+        pygame.display.set_caption('Tetris AI')
+         
+        done = False
+        clock = pygame.time.Clock()
 
+        game = Tetris()
+        game.start()
 
+        def get_event_type(key):
+            if key == pygame.K_w:
+                return 'FLASH'
+            elif key == pygame.K_s:
+                return 'DOWN'
+            elif key == pygame.K_a:
+                return 'LEFT'
+            elif key == pygame.K_d:
+                return 'RIGHT'
+            elif key == pygame.K_ESCAPE:
+                return 'EXIT'
+            elif key == pygame.K_j:
+                return 'ROTATE'
 
+            return None
+
+        def render(game):
+            screen.fill(WHITE)
+
+            x_offset = 0
+            for y in range(game.height):
+                pygame.draw.rect(screen, GREEN, [x_offset, y * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+                pygame.draw.rect(screen, GREEN, [(game.width) * TILE_SIZE + TILE_SIZE + x_offset, y * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+
+            for y in range(game.height):
+                for x in range(game.width):
+                    if game.get_cell(x, y) == '-':
+                        pygame.draw.rect(screen, WHITE, [x * TILE_SIZE + TILE_SIZE + x_offset, y * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+                    elif game.get_cell(x, y) == 'x':
+                        pygame.draw.rect(screen, (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), [x * TILE_SIZE + TILE_SIZE + x_offset, y * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+
+            pygame.display.flip()
+
+        num_updates = 0
+        while not done:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+                elif event.type == pygame.KEYDOWN:
+                    event_type = get_event_type(event.key)
+                    if event_type is not None:
+                        game.event(event_type)
+
+            if game.update():
+                num_updates += 1
+            else:
+                break
+
+            render(game)
+
+        print '{} UPDATES'.format(num_updates)
+
+        pygame.quit()
+
+if __name__ == '__main__':
+    Tetris.main()

@@ -57,11 +57,15 @@ def render(game):
 
     pygame.display.flip()
 
+num_updates = 0
 while not done:
     render(game)
     raw_input()
-    if not game.update(1000):
+    if game.update(1000):
+        num_updates += 1
+    else:
         break
     render(game)
+print '{} UPDATES'.format(num_updates)
 
 pygame.quit()

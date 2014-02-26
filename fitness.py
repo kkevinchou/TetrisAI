@@ -90,15 +90,14 @@ def rows_cleared(grid):
 
     return num_rows_filled / float(height)
 
-
 def calculate_fitness(grid, weights):
     fitness_functions = [sides_touching, grid_height, rows_cleared, blockages]
     fitness_value = 0
 
-    print ' ============ '
+    # print ' ============ '
     for i in range(len(weights)):
         fitness_function_value = fitness_functions[i](grid)
-        print '{} --- {}'.format(fitness_functions[i].__name__, fitness_function_value * weights[i])
+        # print '{} --- {}'.format(fitness_functions[i].__name__, fitness_function_value * weights[i])
         fitness_value += weights[i] * fitness_function_value
 
     return fitness_value
