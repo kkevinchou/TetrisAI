@@ -3,6 +3,7 @@ import copy
 import random
 import math
 from block import Block
+from block import BLOCK_CONFIGS
 from fitness import calculate_fitness
 
 class Tetris(object):
@@ -244,7 +245,6 @@ class Tetris(object):
             for x in range(self.width):
                 self.flash()
                 fitness_score = calculate_fitness(self.grid, self.trait_sets)
-                # print (self.position[0], num_rotation, fitness_score)
 
                 if fitness_score > best_score:
                     best_score = fitness_score
@@ -262,24 +262,7 @@ class Tetris(object):
         self.block = block_backup
         self.grid = grid_backup
 
-        # print (best_x, best_rotation, best_score)
         return (best_x, best_rotation)
-
-    # @classmethod
-    # def main(self, id, results, trait_sets):
-    #     game = Tetris(trait_sets)
-    #     game.start()
-
-    #     num_updates = 0
-    #     while True:
-    #         if game.update():
-    #             num_updates += 1
-    #         else:
-    #             break
-
-    #     print '[{}] {} UPDATES'.format(id, num_updates)
-    #     results.put((id, num_updates))
-
 
     @classmethod
     def main(self, seed, id, results, trait_sets, visual=False):
@@ -293,11 +276,8 @@ class Tetris(object):
 
             TILE_SIZE = 25
              
-            BLACK = (  0,   0,   0)
             WHITE = (255, 255, 255)
-            BLUE =  (  0,   0, 255)
             GREEN = (  0, 255,   0)
-            RED =   (255,   0,   0)
              
             size = [800, 600]
             screen = pygame.display.set_mode(size)
@@ -331,7 +311,7 @@ class Tetris(object):
 
         while True:
             if visual:
-                delta = clock.tick(20)
+                delta = clock.tick(30)
 
             if game.update():
                 num_updates += 1
@@ -352,4 +332,6 @@ if __name__ == '__main__':
         def put(self, item):
             pass
 
-    Tetris.main(1, 0, DummyQueue(), [0.23214383084527834, -0.9285882932729381, 4.333955296231015, -0.09770508846263759], True)
+    # [3.2220703467626075, -1.1052026569788542, 1.8884685398230356, -4.420821661782874]: 1162
+    # [3.0429925127860025, -0.6826343806600234, 1.8565413754198299, -4.620029833768513]: 1099
+    Tetris.main(time.time(), 0, DummyQueue(), [1.0899486313285176, -0.00048470297714053867, 2.05484698586114, -2.7296141753723413], True)

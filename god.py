@@ -5,7 +5,19 @@ from tetris import Tetris
 from multiprocessing import Process, Queue
 
 def breed(a_trait_set, b_trait_set):
-    return [(a_trait_set[i] + b_trait_set[i]) / float(2) for i in range(len(a_trait_set))]
+    child_trait_set = []
+
+    for i in range(len(a_trait_set)):
+        trait = None
+
+        if random.randint(1, 100)  <= 10:
+            trait = random.uniform(-10, 10)
+        else:
+            trait = (a_trait_set[i] + b_trait_set[i]) / float(2)
+
+        child_trait_set.append(trait)
+
+    return child_trait_set
 
 def generate_next_generation_trait_sets(trait_sets, trait_set_results):
     population_size = len(trait_sets)

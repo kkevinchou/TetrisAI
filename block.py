@@ -15,6 +15,7 @@ class Block(object):
     def __init__(self, block_type, config):
         self.block_type = block_type
         self.config = config
+
         if block_type == 'I':
             self.color = (202, 0, 0)
         if block_type == 'J':
