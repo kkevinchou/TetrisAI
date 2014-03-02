@@ -10,6 +10,8 @@ Execution
 
     $ python god.py
     
+    $ # The number of moves each Tetris AI was able to complete
+    $ # Before losing
     $ 8 MOVES
     $ 6 MOVES
     $ 6 MOVES
@@ -27,7 +29,8 @@ Execution
     $ 64 MOVES
     $ 143 MOVES
     $ GENERATION RESULTS:
-    $ # The array represents the weights for each fitness function, the last integer is the number of moves executed before losing
+    $ # The array represents the weights for each fitness function
+    $ # The last integer is the number of moves executed before losing
     $ [6.840760499169466, -7.749389032607827, 0.6858102375895907, -1.5361113081256264]: 143
     $ [1.4849101320267017, -6.246946065548635, 3.4005829269425405, 5.42187479067551]: 64
     $ [5.917563781095321, -5.177124787019403, -8.791056447589247, -5.327712609660063]: 32
