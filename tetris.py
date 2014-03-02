@@ -267,11 +267,9 @@ class Tetris(object):
     @classmethod
     def main(self, seed, id, results, trait_sets, visual=False):
         random.seed(seed)
-        import pygame
-        import sys
-        from math import pi
         
         if visual:
+            import pygame
             pygame.init()
 
             TILE_SIZE = 25
@@ -321,7 +319,7 @@ class Tetris(object):
             if visual:
                 render(game)
 
-        print '{} UPDATES'.format(num_updates)
+        print '{} MOVES'.format(num_updates)
         results.put((id, num_updates))
 
         if visual:
@@ -333,5 +331,5 @@ if __name__ == '__main__':
             pass
 
     # [3.2220703467626075, -1.1052026569788542, 1.8884685398230356, -4.420821661782874]: 1162
-    # [3.0429925127860025, -0.6826343806600234, 1.8565413754198299, -4.620029833768513]: 1099
+    # [3.0429925127860025, -0.6826343806600234, 1.8565413754198299, -4.620029833768513]: 1099   
     Tetris.main(time.time(), 0, DummyQueue(), [1.0899486313285176, -0.00048470297714053867, 2.05484698586114, -2.7296141753723413], True)
