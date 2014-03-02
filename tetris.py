@@ -8,10 +8,11 @@ class Tetris(object):
     width = 8
     height = 22
 
-    def __init__(self, read_grid=False):
+    def __init__(self, trait_sets, read_grid=False):
         self.events = []
         self.init_controls()
         self.reset()
+        self.trait_sets = trait_sets
 
         if read_grid:
             with open('grid.dat') as f:
@@ -235,7 +236,7 @@ class Tetris(object):
 
             for x in range(self.width):
                 self.flash()
-                fitness_score = calculate_fitness(self.grid, [4, -4, 3.5, -10])
+                fitness_score = calculate_fitness(self.grid, self.trait_sets)
                 # print (self.position[0], num_rotation, fitness_score)
 
                 if fitness_score > best_score:
@@ -255,48 +256,48 @@ class Tetris(object):
         # print (best_x, best_rotation, best_score)
         return (best_x, best_rotation)
 
+    # @classmethod
+    # def main(self, id, results, trait_sets):
+    #     game = Tetris(trait_sets)
+    #     game.start()
+
+    #     num_updates = 0
+    #     while True:
+    #         if game.update():
+    #             num_updates += 1
+    #         else:
+    #             break
+
+    #     print '[{}] {} UPDATES'.format(id, num_updates)
+    #     results.put((id, num_updates))
+
+
     @classmethod
-    def main(self):
+    def main(self, id, results, trait_sets, visual=False):
         import random
         import pygame
         import sys
         from math import pi
-         
-        pygame.init()
+        
+        if visual:
+            pygame.init()
 
-        TILE_SIZE = 25
-         
-        BLACK = (  0,   0,   0)
-        WHITE = (255, 255, 255)
-        BLUE =  (  0,   0, 255)
-        GREEN = (  0, 255,   0)
-        RED =   (255,   0,   0)
-         
-        size = [800, 600]
-        screen = pygame.display.set_mode(size)
-        pygame.display.set_caption('Tetris AI')
-         
-        done = False
-        clock = pygame.time.Clock()
+            TILE_SIZE = 25
+             
+            BLACK = (  0,   0,   0)
+            WHITE = (255, 255, 255)
+            BLUE =  (  0,   0, 255)
+            GREEN = (  0, 255,   0)
+            RED =   (255,   0,   0)
+             
+            size = [800, 600]
+            screen = pygame.display.set_mode(size)
+            pygame.display.set_caption('Tetris AI')
+             
+            clock = pygame.time.Clock()
 
-        game = Tetris()
+        game = Tetris(trait_sets)
         game.start()
-
-        def get_event_type(key):
-            if key == pygame.K_w:
-                return 'FLASH'
-            elif key == pygame.K_s:
-                return 'DOWN'
-            elif key == pygame.K_a:
-                return 'LEFT'
-            elif key == pygame.K_d:
-                return 'RIGHT'
-            elif key == pygame.K_ESCAPE:
-                return 'EXIT'
-            elif key == pygame.K_j:
-                return 'ROTATE'
-
-            return None
 
         def render(game):
             screen.fill(WHITE)
@@ -316,25 +317,28 @@ class Tetris(object):
             pygame.display.flip()
 
         num_updates = 0
-        while not done:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
-                elif event.type == pygame.KEYDOWN:
-                    event_type = get_event_type(event.key)
-                    if event_type is not None:
-                        game.event(event_type)
+
+        while True:
+            if visual:
+                delta = clock.tick(2)
 
             if game.update():
                 num_updates += 1
             else:
                 break
 
-            render(game)
+            if visual:
+                render(game)
 
         print '{} UPDATES'.format(num_updates)
+        results.put((id, num_updates))
 
-        pygame.quit()
+        if visual:
+            pygame.quit()
 
 if __name__ == '__main__':
-    Tetris.main()
+    class DummyQueue(object):
+        def put(self, item):
+            pass
+
+    Tetris.main(0, DummyQueue(), [2.325313897045928, -0.0185952947193333, 2.8002719239510183, -2.9902526513367738], True)
