@@ -15,6 +15,20 @@ class Block(object):
     def __init__(self, block_type, config):
         self.block_type = block_type
         self.config = config
+        if block_type == 'I':
+            self.color = (202, 0, 0)
+        if block_type == 'J':
+            self.color = (195, 0, 202)
+        if block_type == 'L':
+            self.color = (238, 255, 0)
+        if block_type == 'O':
+            self.color = (0, 255, 247)
+        if block_type == 'S':
+            self.color = (0, 26, 255)
+        if block_type == 'Z':
+            self.color = (145, 255, 0)
+        if block_type == 'T':
+            self.color = (144, 144, 144)
 
     @staticmethod
     def generate_pool():
@@ -64,7 +78,9 @@ class Block(object):
         return self.config[x][y]
 
     def copy(self):
-        return Block(self.block_type, copy.deepcopy(self.config))
+        block = Block(self.block_type, copy.deepcopy(self.config))
+        block.color = self.color
+        return block
 
     def __str__(self):
         return '\n'.join(' '.join(row) for row in self.config)

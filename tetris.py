@@ -40,6 +40,7 @@ class Tetris(object):
 
     def reset(self):
         self.grid = []
+        self.color_grid = []
         self.block_pool = []
         self.block = None
         self.position = (0, 0)
@@ -48,29 +49,32 @@ class Tetris(object):
 
         for x in range(self.width):
             empty_column = []
+            empty_color_column = []
             for y in range(self.height):
                 empty_column.append('-')
+                empty_color_column.append(None)
+
             self.grid.append(empty_column)
+            self.color_grid.append(empty_color_column)
+
 
     def get_cell(self, x, y):
         return self.grid[x][y]
 
-    def _get_collision_y(selfself, x):
-        for y in range(self.height):
-            if self.get_cell(x, y) == 'x':
-                return y - 1
-
-        return self.height - 1
+    def get_cell_color(self, x, y):
+        return self.color_grid[x][y]
 
     def place_block(self, block, position):
         for x in range(4):
             for y in range(4):
                 if block.get_cell(x, y) == 'x':
                     self.grid[x + position[0]][y + position[1]] = 'x'
+                    self.color_grid[x + position[0]][y + position[1]] = block.color
 
     def _clear_row(self, y):
         for x in range(self.width):
             self.grid[x][y] = '-'
+            self.color_grid[x][y] = None
 
     def _row_is_empty(self, row):
         return 'x' not in self.get_row(row)
@@ -78,6 +82,7 @@ class Tetris(object):
     def _copy_row_to(self, row_from, row_to):
         for x in range(self.width):
             self.grid[x][row_to] = self.get_cell(x, row_from)
+            self.color_grid[x][row_to] = self.get_cell_color(x, row_from)
 
     def _cut_row_to(self, row_from, row_to):
         if row_from == row_to:
@@ -112,6 +117,7 @@ class Tetris(object):
             for y in range(4):
                 if self.block.get_cell(x, y) == 'x':
                     self.grid[self.position[0] + x][self.position[1] + y] = '-'
+                    self.color_grid[self.position[0] + x][self.position[1] + y] = None
 
     def move_down(self):
         new_position = (self.position[0], self.position[1] + 1)
@@ -249,6 +255,8 @@ class Tetris(object):
                 if self.move_right() == False:
                     break
 
+        self.hide_current_block()
+
         self.position = position_backup
         self.block = block_backup
         self.grid = grid_backup
@@ -309,10 +317,12 @@ class Tetris(object):
 
             for y in range(game.height):
                 for x in range(game.width):
-                    if game.get_cell(x, y) == '-':
+                    cell_color = game.get_cell_color(x, y)
+
+                    if cell_color is None:
                         pygame.draw.rect(screen, WHITE, [x * TILE_SIZE + TILE_SIZE + x_offset, y * TILE_SIZE, TILE_SIZE, TILE_SIZE])
-                    elif game.get_cell(x, y) == 'x':
-                        pygame.draw.rect(screen, (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), [x * TILE_SIZE + TILE_SIZE + x_offset, y * TILE_SIZE, TILE_SIZE, TILE_SIZE])
+                    else:
+                        pygame.draw.rect(screen, cell_color, [x * TILE_SIZE + TILE_SIZE + x_offset, y * TILE_SIZE, TILE_SIZE, TILE_SIZE])
 
             pygame.display.flip()
 
@@ -320,7 +330,7 @@ class Tetris(object):
 
         while True:
             if visual:
-                delta = clock.tick(2)
+                delta = clock.tick(1)
 
             if game.update():
                 num_updates += 1
