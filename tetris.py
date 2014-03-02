@@ -1,3 +1,4 @@
+import time
 import copy
 import random
 import math
@@ -281,8 +282,8 @@ class Tetris(object):
 
 
     @classmethod
-    def main(self, id, results, trait_sets, visual=False):
-        import random
+    def main(self, seed, id, results, trait_sets, visual=False):
+        random.seed(seed)
         import pygame
         import sys
         from math import pi
@@ -330,7 +331,7 @@ class Tetris(object):
 
         while True:
             if visual:
-                delta = clock.tick(1)
+                delta = clock.tick(20)
 
             if game.update():
                 num_updates += 1
@@ -351,4 +352,4 @@ if __name__ == '__main__':
         def put(self, item):
             pass
 
-    Tetris.main(0, DummyQueue(), [2.325313897045928, -0.0185952947193333, 2.8002719239510183, -2.9902526513367738], True)
+    Tetris.main(1, 0, DummyQueue(), [0.23214383084527834, -0.9285882932729381, 4.333955296231015, -0.09770508846263759], True)

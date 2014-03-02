@@ -1,5 +1,6 @@
 import heapq
 import random
+import time
 from tetris import Tetris
 from multiprocessing import Process, Queue
 
@@ -60,8 +61,9 @@ def main():
         # trait_sets[i] = [4, -4, 3.5, -10]
 
     for generation in range(num_generations):
+        seed = time.time()
         for i in range(population_size):
-            process_map[i] = Process(target=Tetris.main, args=[i, result_queue, trait_sets[i]])
+            process_map[i] = Process(target=Tetris.main, args=[seed, i, result_queue, trait_sets[i]])
             process_map[i].start()
 
         for process in process_map:
