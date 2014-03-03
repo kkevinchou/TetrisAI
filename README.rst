@@ -72,9 +72,32 @@ and after a few generations, our AI performs better:
 Viewing The AI
 ------------
 
-To view an AI with a particular trait set, update the "trait_set.dat" file with your own weights
-Note, you'll need to have pygame installed in your environment
+* To view an AI with a particular trait set, update the "trait_set.dat" file with your own weights.
+* Note, you'll need to have pygame installed in your environment
 
 .. code-block:: bash
 
     $ python visual_ai.py
+
+How It Works
+------------
+The Tetris AI runs through every possible move for its current configuration and selects the "best" one by measuring four properties:
+
+
+1. The current height of the current configuration
+2. The number of sides touching in the current configuration
+3. The number of "blockages" in the configuration
+4. The number of rows cleared
+
+
+"blockages" are defined as filled blocks that are above an empty cell in the same column. The "best" move is whichever move provides generates the best score, where the score is some mathematical combination of the four properties
+
+
+* To evolve, we first start with a generation of 16 tetris AIs where the weights for each property is a random value from -10 to 10.
+* Then we repeat the following process for several generations:
+* We run the tetris simulations until all of them lose
+* We select the best AI (The one that made the most number of moves before dying) and breed it with the top performing half of the population
+* Breeding is done by averaging the trait set of the parents which generates a child trait set
+* For each trait there is a 10% chance that instead of using the average of the parents' trait, the trait receives a random value from -10 to 10
+* The rest of the population is filled in by breeding random pairs of AIs, making sure not to breed the a pair of AIs more than once
+* This is repeated for some number of generations until you're satisfied with the performance of the AIs
