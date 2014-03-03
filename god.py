@@ -61,7 +61,6 @@ def main():
     num_generations = 20
     population_size = 16
     process_map = [None] * population_size
-    process_results = {}
     result_queue = Queue()
     trait_sets = [None] * population_size
 
@@ -70,7 +69,6 @@ def main():
 
     for i in range(population_size):
         trait_sets[i] = [random.uniform(-10, 10), random.uniform(-10, 10), random.uniform(-10, 10), random.uniform(-10, 10)]
-        # trait_sets[i] = [4, -4, 3.5, -10]
 
     for generation in range(num_generations):
         seed = time.time()
@@ -99,14 +97,6 @@ def main():
             print '{}: {}'.format(trait_sets[index], trait_set_results[index])
 
         trait_sets = generate_next_generation_trait_sets(trait_sets, trait_set_results)
-
-    # sorted_trait_set_indexes = sorted(trait_set_results.keys(), key=trait_set_results.get, reverse=True)
-    # print sorted_trait_set_indexes
-
-    # print 'Final Trait Sets:'
-    # for i in range(len(sorted_trait_set_indexes)):
-    #     index = sorted_trait_set_indexes[i]
-    #     print '{}: {}'.format(trait_sets[index], trait_set_results[index])
 
 if __name__ == '__main__':
     main()

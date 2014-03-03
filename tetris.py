@@ -1,34 +1,18 @@
-import time
 import copy
 import random
 import math
 from block import Block
-from block import BLOCK_CONFIGS
 from fitness import calculate_fitness
 
 class Tetris(object):
     width = 8
     height = 22
 
-    def __init__(self, trait_sets, read_grid=False):
+    def __init__(self, trait_sets):
         self.events = []
         self.init_controls()
         self.reset()
         self.trait_sets = trait_sets
-
-        if read_grid:
-            with open('grid.dat') as f:
-                y = 0
-                for line in f:
-                    if len(line) < self.width:
-                        break
-
-                    x = 0
-                    for cell in line:
-                        if cell == 'x':
-                            self.grid[x][y] = 'x'
-                        x += 1
-                    y += 1
 
     def init_controls(self):
         self.event_to_action = {
@@ -309,7 +293,7 @@ class Tetris(object):
 
         while True:
             if visual:
-                delta = clock.tick(30)
+                clock.tick(10)
 
             if game.update():
                 num_updates += 1
@@ -325,11 +309,6 @@ class Tetris(object):
         if visual:
             pygame.quit()
 
-if __name__ == '__main__':
-    class DummyQueue(object):
-        def put(self, item):
-            pass
-
     # [3.2220703467626075, -1.1052026569788542, 1.8884685398230356, -4.420821661782874]: 1162
     # [3.0429925127860025, -0.6826343806600234, 1.8565413754198299, -4.620029833768513]: 1099   
-    Tetris.main(time.time(), 0, DummyQueue(), [1.0899486313285176, -0.00048470297714053867, 2.05484698586114, -2.7296141753723413], True)
+    # Tetris.main(time.time(), 0, DummyQueue(), [1.0899486313285176, -0.00048470297714053867, 2.05484698586114, -2.7296141753723413], True)

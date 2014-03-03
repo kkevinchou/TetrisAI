@@ -10,8 +10,7 @@ Execution
 
     $ python god.py
     
-    $ # The number of moves each Tetris AI was able to complete
-    $ # Before losing
+    $ # The number of moves each Tetris AI was able to complete before losing
     $ 8 MOVES
     $ 6 MOVES
     $ 6 MOVES
@@ -69,3 +68,13 @@ and after a few generations, our AI performs better:
     $ [0.000656935914453094, -2.6187426313439572, -8.226202273287651, -2.9223967407303286]: 29
     $ [-3.4423869646668255, -2.3023439827079155, 1.9430440220366891, -3.0518509689291653]: 24
     $ [0.19692468880062064, -2.001442828933368, 0.8750237323488945, 5.8878649517461135]: 22
+
+Viewing The AI
+------------
+
+To view an AI with a particular trait set, update the "trait_set.dat" file with your own weights
+Note, you'll need to have pygame installed in your environment
+
+.. code-block:: bash
+
+    $ python visual_ai.py
