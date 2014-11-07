@@ -95,9 +95,9 @@ The Tetris AI runs through every possible move for its current configuration and
 
 * To evolve, we first start with a generation of 16 tetris AIs where the weights for each property is a random value from -10 to 10.
 * Then we repeat the following process for several generations:
-* We run the tetris simulations until all of them lose
-* We select the best AI (The one that made the most number of moves before dying) and breed it with the top performing half of the population
-* Breeding is done by averaging the trait set of the parents which generates a child trait set
-* For each trait there is a 10% chance that instead of using the average of the parents' trait, the trait receives a random value from -10 to 10
-* The rest of the population is filled in by breeding random pairs of AIs, making sure not to breed the a pair of AIs more than once
-* This is repeated for some number of generations until you're satisfied with the performance of the AIs
+* * We run the tetris simulations until all of them lose
+* * We select the best AI (The one that made the most number of moves before dying) and breed it with the top performing half of the population
+* * Breeding is done by averaging the trait set of the parents which generates a child trait set
+* * For each trait there is a 10% chance that instead of using the average of the parents' trait, the trait receives a random value from -10 to 10
+* * The rest of the population is filled in by breeding random pairs of AIs, making sure not to breed the a pair of AIs more than once
+* * This is repeated for some number of generations until you're satisfied with the performance of the AIs
