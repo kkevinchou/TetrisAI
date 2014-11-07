@@ -99,5 +99,5 @@ The Tetris AI runs through every possible move for its current configuration and
    2. We select the best AI (The one that made the most number of moves before dying) and breed it with the top performing half of the population
    3. Breeding is done by averaging the trait set of the parents which generates a child trait set
    4. For each trait there is a 10% chance that instead of using the average of the parents' trait, the trait receives a random value from -10 to 10
-   5. The rest of the population is filled in by breeding random pairs of AIs, making sure not to breed the a pair of AIs more than once
-   6. This is repeated for some number of generations until you're satisfied with the performance of the AIs
+   5. The rest of the population is filled in by breeding random pairs of AIs, making sure not to breed the same pair of AIs more than once
+   6. Repeat for some number of generations until you're satisfied
