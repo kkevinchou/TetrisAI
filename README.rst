@@ -90,7 +90,7 @@ The Tetris AI runs through every possible move for its current configuration and
 4. The number of rows cleared
 
 
-"blockages" are defined as filled blocks that are above an empty cell in the same column. The "best" move is whichever move provides generates the best score, where the score is some mathematical combination of the four properties
+"blockages" are defined as filled blocks that are above an empty cell in the same column. The "best" move is whichever move generates the best score, where the score is some mathematical combination of the four properties
 
 
 * To evolve, we first start with a generation of 16 tetris AIs where the weights for each property is a random value from -10 to 10.
